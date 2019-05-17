@@ -1,0 +1,356 @@
+<html>
+  <head>
+
+    <link rel="stylesheet" type="text/css" href="adventure.css">
+
+    <div style="font-family: 'adventureFontl';">
+
+<!-- Remove Chrome outline of text field -->
+    <style type="text/css">
+        input:focus,
+        textarea:focus,
+        select:focus {
+        outline: none;
+        }
+    </style>
+
+<!-- Makes text field border transparent -->
+    <style type="text/css">
+        input {
+        border: none;
+        background-color: transparent;
+        }
+    </style>
+
+<script type = "text/javascript">
+
+// game arrays //
+  var message = []
+
+  var rooms = ["room1", "room2", "room3", "room4"]
+
+  // Exits
+  var exits = new Array("E", "SWE", "WE", "SWE", "WE", "WE", "SWE", "WS",
+                        "NSE", "SE", "WE", "NW", "SE", "W", "SNE", "NSW",
+                        "NS", "NS", "SE", "WE", "NWE", "SWE", "WS", "N",
+                        "N", "NWE", "NWE", "WE", "WE", "NW", "NE", "W");
+
+  // Objects in game
+  var GameObjects = new Array(" ", "Physics Notes", "Key Card", "Knife");
+
+  // Inventory
+  var inventory = new Array();
+  inventory [0] = 1;
+
+  //location of game objects - these objects relate to a array index - so Object[1] the Painting is located
+  //in rooms[2] the small garden - 999 indicates out of play
+  var objectLocations = [999, 2, 3, 4]
+
+  // Setting up game
+  var gameStart = message[0];
+  var gameEnd = message[1];
+  var gameForm = '<input type = "type" id = "answer" autofocus> <input type = "button" id = "enter" onclick="yourMove();" value = "enter" style="position: absolute; left: -9999px" />';
+  var room = 0;
+  var number = 0;
+
+
+// The Game
+
+  function stuff()
+  {
+    // gameStart - room0
+    message[0] = "Do you want to play a game?";
+
+    // stage 1 - room1
+    message[1] = "You wake up. It's dark.";
+      // stage 1 - room1 (actions)
+        message[2] = "You get out of bed. You shiver as your bare feet touch the cold metal floor. You hear the soft continuous sound of rushing air. It's cold.";
+        message[3] = "It's dark, you can't see a thing.";
+        message[4] =  "You use the bed frame to guide you through the darkness to the lightpanel by the door.";
+        message[5] = "The room fills with a synthetic red light. You can see now.</p>";
+        message[5] += "The room is flooded in a soft red glow. There's a <b>bed</b>, a small wooden <b>bedside table</b>, a large <b>dresser</b>, and a messy <b>desk</b> with a small lamp. A small <b>window</b> lies on the wall across from the bed.";
+      // stage 2 - room2 (actions)
+        message[7] = "No time for that now.";
+        message[8] = "The dresser has all of your clothes. Well, not your clothes - their clothes.</p>";
+          message[8] += "You're awake now. Might as well change.";
+          message[9] = "You change out of your sleeping garmets into the dark-red worksuit.";
+        message[10] = "The bed is modest. You wish they gave you more blankets.";
+          message[11] = "You aren't tired."
+          message[11] += message[6]
+        message[12] = "The desk is full of books, loose papers, and crumpled notes. A flouresent desk lamp you brought from home sits next to a framed picture.";
+          message[13] = "<i> Quantum Propulsion Theory. The Quandries of the Mathematical Universe. The Metaphysics of GIMPs.</i> </p>";
+            message[13] += "They are old and worn. Books were the only thing you were allowed to bring from home. </p> </br>";
+            message[13] += message[12];
+          message[14] = "Letters. The gilded insignia of the Interplanetary Alliance. </p>";
+            message[14] += message[12];
+          message[15] = "Equations. You're so close. They can't know. </p>";
+            message[15] += message[12];
+          message[16] = "That picture is the only thing that keeps you sane. It's: </p> </br>";
+            message[16] += " > <b>Mila</b>. On her first birthday. </p> </br> ";
+            message[16] += " > You and<b> Dr. Shevek </b>. Before the university shut down. </p> </br>";
+            message[16] += " > <b>Cyrus</b>. Smiling. </p> </br>";
+        message[17] = "Darkness.";
+        message[18] = "You see a red light start to flash through the small window in the door.";
+        message[19] = "You should grab your key card. You think it's on the bedside table.";
+        message[20] = "Your key card lies on the table. In bold letters it says your name. What's your full name?";
+        message[21] = "[name] - ACADEMIC GUEST.";
+        message[22] = "You pick up the key card.";
+        message[23] = "You walk over to the door. It slides open with a hiss.";
+        message[24] = "You walk over to the door. It's locked. You need your key card.";
+
+  // starting message
+  var respond = document.getElementById("messageBox");
+  var input = document.getElementById("inputForm");
+
+  // allows for 'enter' key to submit input & focuses on submit
+  input.addEventListener("keyup", function(event)
+  {
+    event.preventDefault();
+    if (event.keyCode === 13) {
+      document.getElementById("enter").click();
+      document.getElementById("answer").focus();
+    }
+  });
+
+  respond.innerHTML = message[0];
+  input.innerHTML = gameForm;
+
+  }
+
+  if (inventory.length > 0) {
+      DisplayText("You are carrying: ");
+      for (var i = 0; i < inventory.length ; i++) {
+          DisplayText("-" + GameObjects[inventory[i]]);
+      }
+  }
+
+  // Connecting user input
+
+  function yourMove()
+  {
+
+  respond = document.getElementById("messageBox");
+  input = document.getElementById('inputForm');
+  answer = document.getElementById("answer").value;
+  activeInventory = document.getElementById("inventoryList");
+  roomTitle = document.getElementById("test");
+
+
+  // pick up object
+  var pickup = function (roomIndex) {
+      var itemIndex;
+      if (objectLocations[roomIndex] > 0 && objectLocations[roomIndex] < 1000) {
+          itemIndex = objectLocations[roomIndex];
+          inventory[inventory.length] = itemIndex;
+          alert(inventory[3]);
+      }
+  }
+
+  //loops through the object location array and returns
+  function getObjectForRoom(room) {
+      var roomIndex = -1;
+      for (var i = 0; i < objectLocations.length ; i++) {
+          if (objectLocations[i] == room)
+              roomIndex = i;
+      }
+      return roomIndex
+  }
+
+  //Replaces the indexOf js function
+  function checkIndex(issFullArray, issToCheck) {
+      for (i = 0; i < issFullArray.length; i++) {
+          if (issFullArray[i] == issToCheck) {
+              return true;
+          }
+      }
+      return false;
+  }
+
+  /////////////////////////////////////////////////
+  if (room == 0 && /y/i.test(answer))
+  {
+  number = 1;
+  room = 1;
+  }
+  /////////////////////////////////////////////////
+  if (room == 1 && /(stand)|(get up)/i.test(answer))
+  {
+  number = 2;
+  room = 1;
+  }
+  if (room == 1 && /(look)|(around)|(search)/i.test(answer))
+  {
+  number = 3;
+  room = 1;
+  }
+  if (room == 1 && /(find a)|(light)|(lamp)/i.test(answer))
+  {
+  number = 4;
+  room = 1;
+  }
+  if (room == 1 && /(turn)|(on)/i.test(answer))
+  {
+  number = 5;
+  room = 2;
+  }
+  /////////////////////////////////////////////////
+  if (room == 2 && /(dresser)/i.test(answer))
+  {
+  number = 8;
+  room = 2;
+  }
+  if (room == 2 && /(change)/i.test(answer))
+  {
+  number = 9;
+  room = 2;
+  }
+  if (room == 2 && /(bed)/i.test(answer))
+  {
+  number = 10;
+  room = 2;
+  }
+  if (room == 2 && /(sleep)|(go to bed)/i.test(answer))
+  {
+  number = 11;
+  room = 2;
+  }
+  if (room == 2 && /(desk)/i.test(answer))
+  {
+  number = 12;
+  room = 2;
+  }
+  if (room == 2 && /(books)/i.test(answer))
+  {
+  number = 13;
+  room = 2;
+  }
+  if (room == 2 && /(papers)/i.test(answer))
+  {
+  number = 14;
+  room = 2;
+  }
+  if (room == 2 && /(notes)/i.test(answer))
+  {
+  number = 15;
+  room = 2;
+  }
+  if (room == 2 && /(picture)|(frame)/i.test(answer))
+  {
+  number = 16;
+  room = 2;
+  }
+  if (room == 2 && /(Mila)|(Shevek)|(Cyrus)/i.test(answer))
+  {
+  number = 18;
+  room = 2;
+  }
+  if (room == 2 && /(go to door)|(outside)|(door)|(go)/i.test(answer))
+  {
+  number = 19;
+  room = 2;
+  }
+  if (room == 2 && /(table)|(bedside)/i.test(answer))
+  {
+  number = 20;
+  room = 2;
+  }
+  if (room == 2 && /(abbey)/i.test(answer))
+  {
+  number = 21;
+  room = 2;
+  }
+  if (room == 2 && /(take)|(key card)|(pick up)/i.test(answer))
+  {
+  pickup(room);
+  getObjectForRoom(room);
+  number = 22;
+  room = 2;
+  }
+  if (room == 2 && /(open)|(door)|(go to door)/i.test(answer))
+  {
+  number = 23;
+  room = 2;
+  }
+
+  respond.innerHTML = message[number];
+  input.innerHTML = gameForm;
+
+  activeInventory.innerHTML = (GameObjects[inventory[i]]);
+  roomTitle.innerHTML = (rooms[room]);
+
+  }
+
+</script>
+
+<!-- Formatting and uploading to page -->
+  <body onload = "stuff()">
+
+        <div id = "inventoryList"
+            style = "
+              width : 300px;
+              height: 500px;
+              margin: 0 auto;
+              position: fixed;
+              border: solid 1px red;
+              ">
+        </div>
+
+        <div id = "test"
+                style = "
+                  width : 300px;
+                  height: 500px;
+                  margin: 0 auto;
+                  position: fixed;
+                  border: solid 1px blue;
+                  ">
+            </div>
+
+    <div id = "container"
+        style = "
+          width : 600px;
+          height: 600px;
+          margin: 0 auto;
+          position: fixed;
+          top: 50%;
+          left: 35%;
+          -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
+      ">
+
+    <div id = "container"
+          style = "
+          width : 585px;
+          height: 100px;
+          margin: 0 auto;
+          position: absolute;
+          top: 30%;
+          -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
+          overflow: auto; //
+      ">
+
+    <div id = "messageBox"
+            style = "
+              width : 585px;
+              margin: 0 auto;
+              position: relative;
+              overflow: auto;
+              ">
+          </div>
+        </div>
+
+    <div id = "inputForm"
+            style = "
+              width : 560px;
+              height: 10px;
+              margin: 0 auto;
+              position: fixed;
+              top: 45%;
+              padding: 5px 5px 5px 1px;
+                ">
+        </div>
+      </div>
+
+
+  </body>
+</html>
