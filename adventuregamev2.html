@@ -38,13 +38,16 @@
   // Objects in game
   var GameObjects = new Array(" ", "Physics Notes", "Key Card", "Knife");
 
+  // new object for mapping object locations to items
+  var roomObjects = {999: "", 1: "Physics Notes", 2: "Key Card", 3: "Knife"}
+
   // Inventory
   var inventory = new Array();
-  inventory [0] = 1;
+  console.log('[script definition] inventory', inventory)
 
   //location of game objects - these objects relate to a array index - so Object[1] the Painting is located
   //in rooms[2] the small garden - 999 indicates out of play
-  var objectLocations = [999, 2, 3, 4]
+  var objectLocations = [999, 1, 2, 3]
 
   // Setting up game
   var gameStart = message[0];
@@ -117,10 +120,17 @@
 
   }
 
+  // this never executes...
   if (inventory.length > 0) {
-      DisplayText("You are carrying: ");
+    console.log('now')
+      // what is DisplayText?
+      // DisplayText("You are carrying: ");
+      var messageBox = document.getElementById("messageBox");
+
+      // this isn't working
+      messageBox.innerHtml = "You are carrying: ";
       for (var i = 0; i < inventory.length ; i++) {
-          DisplayText("-" + GameObjects[inventory[i]]);
+        messageBox.append(inventory[i])
       }
   }
 
@@ -133,26 +143,42 @@
   input = document.getElementById('inputForm');
   answer = document.getElementById("answer").value;
   activeInventory = document.getElementById("inventoryList");
-  roomTitle = document.getElementById("test");
+  // roomTitle = document.getElementById("test");
 
 
   // pick up object
-  var pickup = function (roomIndex) {
-      var itemIndex;
+  function pickup (roomIndex) {
+      console.log('[pickup] roomIndex', roomIndex)
+      console.log('[pickup] objectLocations', objectLocations)
+      console.log('[pickup] inventory', inventory)
       if (objectLocations[roomIndex] > 0 && objectLocations[roomIndex] < 1000) {
-          itemIndex = objectLocations[roomIndex];
-          inventory[inventory.length] = itemIndex;
-          alert(inventory[3]);
+
+          // to do:
+          // should i be able to pick up multiple of the same item?
+          // could increment the counter, or just not add it to the array if it's already in there
+          // probably just make the inventory also an object instead of an array
+          inventory.push(roomObjects[roomIndex])
+          console.log('[pickup] inventory', inventory);
       }
+  }
+
+  // function scanRoomForItems(room){
+  //   if(we find an item in the room, return the position of the item)
+  // }
+
+  function addItemToInventory(item) {
+    inventory.push(item)
   }
 
   //loops through the object location array and returns
   function getObjectForRoom(room) {
+    console.log('room', room)
       var roomIndex = -1;
       for (var i = 0; i < objectLocations.length ; i++) {
           if (objectLocations[i] == room)
               roomIndex = i;
       }
+      console.log('[getObjectForRoom] roomIndex',roomIndex)
       return roomIndex
   }
 
@@ -166,7 +192,19 @@
       return false;
   }
 
+  // append the newly added item to the list
+  function updateInventoryScreen() {
+    //
+    console.log('updateInventory')
+
+    // to do: spaces between inventory items, right now it
+    // just prints the full array
+    activeInventory.innerHTML = "You are carrying: " + inventory
+  }
+
   /////////////////////////////////////////////////
+  console.log('i is always undefined', i)
+  // to do: figure out what i thinks it's needed for
   if (room == 0 && /y/i.test(answer))
   {
   number = 1;
@@ -263,6 +301,7 @@
   {
   pickup(room);
   getObjectForRoom(room);
+  updateInventoryScreen()
   number = 22;
   room = 2;
   }
@@ -275,8 +314,9 @@
   respond.innerHTML = message[number];
   input.innerHTML = gameForm;
 
-  activeInventory.innerHTML = (GameObjects[inventory[i]]);
-  roomTitle.innerHTML = (rooms[room]);
+  // updateInventory()
+  // activeInventory.innerHTML = (GameObjects[0]);
+  // roomTitle.innerHTML = (rooms[room]);
 
   }
 
@@ -295,7 +335,7 @@
               ">
         </div>
 
-        <div id = "test"
+        <!-- <div id = "test"
                 style = "
                   width : 300px;
                   height: 500px;
@@ -303,7 +343,7 @@
                   position: fixed;
                   border: solid 1px blue;
                   ">
-            </div>
+            </div> -->
 
     <div id = "container"
         style = "
@@ -326,7 +366,7 @@
           top: 30%;
           -ms-transform: translateY(-50%);
           transform: translateY(-50%);
-          overflow: auto; //
+          overflow: auto; 
       ">
 
     <div id = "messageBox"
